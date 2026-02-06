@@ -63,8 +63,8 @@ def predict():
         os.remove(filepath)
 
         return jsonify({
-            'class': result_label,
-            'confidence': f"{confidence:.2f}%"
+            'class': result_label
+            # 'confidence': f"{confidence:.2f}%"
         })
 
     return jsonify({'error': 'Invalid file type'}), 400

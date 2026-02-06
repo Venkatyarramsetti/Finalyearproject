@@ -69,7 +69,7 @@ const Detector = () => {
           {result.class === 'Hazardous' ? <AlertCircle size={32} /> : <CheckCircle size={32} />}
           <div>
             <h3>Predicted Class: <span>{result.class}</span></h3>
-            <p>Confidence: {result.confidence}</p>
+            {/* <p>Confidence: {result.confidence}</p> */}
           </div>
         </div>
       )}

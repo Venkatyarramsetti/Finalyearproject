@@ -8,6 +8,7 @@ const Home = () => {
         <h1>Image classification</h1>
         <p>Using Deep Learning (VGG16 + ResNet50) to classify waste into Hazardous, Safe, Recyclable, and Non-Recyclable categories.</p>
         <Link to="/detect" className="cta-button">Start Detecting</Link>
+        <span align="center">ALLOWED_EXTENSIONS  = 'png', 'jpg', 'jpeg'</span>
       </div>
     </div>
   );
