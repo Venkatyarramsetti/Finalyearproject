@@ -28,8 +28,12 @@ const Detector = () => {
 
     setLoading(true);
     try {
-      // Connects to Flask Backend
-      const response = await axios.post('http://localhost:5000/predict', formData, {
+      // ✅ CHANGED THIS LINE
+      // It tries to find the VITE_API_URL environment variable. 
+      // If it doesn't find it (like on your laptop), it falls back to localhost.
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      
+      const response = await axios.post(`${API_URL}/predict`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setResult(response.data);
