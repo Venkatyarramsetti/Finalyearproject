@@ -31,6 +31,12 @@
   align-items: center;
 }
 
+.faq-toggle-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
 .faq-answer {
   padding: 15px;
   background-color: #f9f9f9;
