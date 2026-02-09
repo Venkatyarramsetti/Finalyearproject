@@ -67,12 +67,27 @@ const faqs = [
     answer: "Many existing projects only classify \"Metal vs. Plastic\" or \"Wet vs. Dry.\" Our system introduces the Hazardous category, which is critical for environmental safety and compliance with modern e-waste regulations, giving it a significant edge in practical utility."
   }
 ];
-
 const teamMembers = [
-  { name: 'Member 1', role: 'Project Lead' },
-  { name: 'Member 2', role: 'Backend Developer' },
-  { name: 'Member 3', role: 'Frontend Developer' },
-  { name: 'Member 4', role: 'ML Engineer' },
+  { 
+    name: 'Vadisila Lohith', 
+    role: 'Model Developer',
+    desc: 'Designed the VGG16+ResNet50 Ensemble & Training Pipeline.'
+  },
+  { 
+    name: 'Yarramsetti Satya Sai Venkat', 
+    role: 'Backend & Integration Lead & project deployer',
+    desc: 'Built the Flask API and handled Model Deployment & Hosted project in Hugging Face and Netlify.'
+  },
+  { 
+    name: 'Tipanna Chetan', 
+    role: 'Frontend UI Developer',
+    desc: 'Developed the React Interface and User Experience.'
+  },
+  { 
+    name: 'Katta Nikhil', 
+    role: 'Data Collector & QA',
+    desc: 'Managed the Hazardous Waste Dataset and System Testing.'
+  },
 ];
 
 const FAQ = () => {
@@ -112,6 +127,7 @@ const FAQ = () => {
               <div className="profile-placeholder"></div>
               <h3>{member.name}</h3>
               <p>{member.role}</p>
+              <p>{member.desc}</p>
             </div>
           ))}
         </div>
