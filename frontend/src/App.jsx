@@ -19,7 +19,7 @@ function App() {
           </Routes>
         </div>
         <footer className="footer">
-          <p>Fourth_Two_Project</p>
+          <p>Copyright&copy; 2026</p>
         </footer>
       </div>
     </Router>
