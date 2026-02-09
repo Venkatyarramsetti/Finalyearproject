@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './FAQ.css';
+import pullUpIcon from '../assets/icons8-pull-up-bar.gif';
+import dropDownIcon from '../assets/icons8-drop-down-64.png';
 
 const faqs = [
   {
@@ -109,7 +111,11 @@ const FAQ = () => {
           <div key={index} className="faq-item">
             <div className="faq-question" onClick={() => toggleFAQ(index)}>
               {faq.question}
-              <span>{activeIndex === index ? '-' : '+'}</span>
+              <img 
+                src={activeIndex === index ? pullUpIcon : dropDownIcon} 
+                alt="toggle" 
+                className="faq-toggle-icon"
+              />
             </div>
             {activeIndex === index && (
               <div className="faq-answer">
