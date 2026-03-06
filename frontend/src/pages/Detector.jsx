@@ -28,15 +28,25 @@ const Detector = () => {
 
     setLoading(true);
     try {
-      // ✅ CHANGED THIS LINE
-      // It tries to find the VITE_API_URL environment variable. 
-      // If it doesn't find it (like on your laptop), it falls back to localhost.
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      
+
       const response = await axios.post(`${API_URL}/predict`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setResult(response.data);
+
+      const data = response.data;
+
+      // Convert to percentage if backend sends decimal (0.82 → 82)
+      const confidencePercent = data.confidence <= 1 ? data.confidence * 100 : data.confidence;
+
+      if (confidencePercent < 70) {
+        setError("🗑️ Even garbage deserves clarity. Try uploading a better picture!");
+        setResult(null);
+      } else {
+        setResult(data);
+        setError('');
+      }
+
     } catch (err) {
       setError('Failed to connect to the server. Is Backend running?');
     } finally {
@@ -49,7 +59,13 @@ const Detector = () => {
       <h2>Waste Classification AI</h2>
       
       <div className="upload-box">
-        <input type="file" id="file-upload" accept="image/*" onChange={handleFileChange} hidden />
+        <input
+          type="file"
+          id="file-upload"
+          accept="image/*"
+          onChange={handleFileChange}
+          hidden
+        />
         <label htmlFor="file-upload" className="upload-label">
           <Upload size={40} />
           <p>Click to Upload Image</p>
@@ -72,8 +88,9 @@ const Detector = () => {
         <div className={`result-card ${result.class === 'Hazardous' ? 'danger' : 'safe'}`}>
           {result.class === 'Hazardous' ? <AlertCircle size={32} /> : <CheckCircle size={32} />}
           <div>
-            <h3>Predicted Class: <span>{result.class}</span></h3>
-            {/* <p>Confidence: {result.confidence}</p> */}
+            <h3>
+              Predicted Class: <span>{result.class}</span>
+            </h3>
           </div>
         </div>
       )}
