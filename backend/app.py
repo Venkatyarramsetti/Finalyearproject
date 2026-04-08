@@ -11,9 +11,10 @@ app = Flask(__name__)
 CORS(app)  # Allow React to communicate with this server
 
 # --- CONFIGURATION ---
-UPLOAD_FOLDER = 'uploads'
-MODEL_PATH = 'final_waste_model.h5'
-LABELS_PATH = 'class_labels.json'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+MODEL_PATH = os.path.join(BASE_DIR, 'final_waste_model.h5')
+LABELS_PATH = os.path.join(BASE_DIR, 'class_labels.json')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -39,11 +40,11 @@ def predict():
         return jsonify({'error': 'No file part'}), 400
     
     file = request.files['file']
-    if file.filename == '':
+    filename = secure_filename(file.filename or '')
+    if filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
 
@@ -55,7 +56,7 @@ def predict():
 
         # --- PREDICTION ---
         predictions = model.predict(img_array)
-        predicted_index = np.argmax(predictions)
+        predicted_index = int(np.argmax(predictions))
         confidence = float(np.max(predictions) * 100)
         result_label = class_map.get(predicted_index, "Unknown")
 
@@ -63,8 +64,8 @@ def predict():
         os.remove(filepath)
 
         return jsonify({
-            'class': result_label
-            # 'confidence': f"{confidence:.2f}%"
+            'class': result_label,
+            'confidence': confidence
         })
 
     return jsonify({'error': 'Invalid file type'}), 400

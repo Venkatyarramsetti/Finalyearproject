@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import './FAQ.css';
-import pullUpIcon from '../assets/icons8-pull-up-bar.gif';
-import dropDownIcon from '../assets/icons8-drop-down-64.png';
+import { ChevronDown, Code, Palette, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const faqs = [
   {
@@ -73,70 +72,167 @@ const teamMembers = [
   { 
     name: 'Vadisila Lohith', 
     role: 'Model Developer',
-    desc: 'Designed the VGG16+ResNet50 Ensemble & Training Pipeline.'
+    desc: 'Designed the VGG16+ResNet50 Ensemble & Training Pipeline.',
+    icon: Code,
   },
   { 
     name: 'Yarramsetti Satya Sai Venkat', 
-    role: 'Backend & Integration Lead & project deployer',
-    desc: 'Built the Flask API and handled Model Deployment & Hosted project in Hugging Face and Netlify.'
+    role: 'Backend & Integration Lead',
+    desc: 'Built the Flask API and handled Model Deployment & Hosted project.',
+    icon: Code,
   },
   { 
     name: 'Tipanna Chetan', 
     role: 'Frontend UI Developer',
-    desc: 'Developed the React Interface and User Experience.'
+    desc: 'Developed the React Interface and User Experience.',
+    icon: Palette,
   },
   { 
     name: 'Katta Nikhil', 
     role: 'Data Collector & QA',
-    desc: 'Managed the Hazardous Waste Dataset and System Testing.'
+    desc: 'Managed the Hazardous Waste Dataset and System Testing.',
+    icon: Check,
   },
 ];
 
-const FAQ = () => {
+const FAQ = ({ isDarkMode }) => {
   const [activeIndex, setActiveIndex] = useState(null);
 
-  const toggleFAQ = index => {
-    if (activeIndex === index) {
-      setActiveIndex(null);
-    } else {
-      setActiveIndex(index);
-    }
+  const containerVars = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+    },
+  };
+
+  const itemVars = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
 
   return (
-    <div className="faq-container">
-      <h1 className="faq-title">Frequently Asked Questions</h1>
-      <div className="faq-list">
-        {faqs.map((faq, index) => (
-          <div key={index} className="faq-item">
-            <div className="faq-question" onClick={() => toggleFAQ(index)}>
-              {faq.question}
-              <img 
-                src={activeIndex === index ? pullUpIcon : dropDownIcon} 
-                alt="toggle" 
-                className="faq-toggle-icon"
-              />
-            </div>
-            {activeIndex === index && (
-              <div className="faq-answer">
-                {faq.answer}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="team-section">
-        <h2 className="team-title">Our Team</h2>
-        <div className="team-members">
-          {teamMembers.map((member, index) => (
-            <div key={index} className="team-member">
-              <div className="profile-placeholder"></div>
-              <h3>{member.name}</h3>
-              <p>{member.role}</p>
-              <p>{member.desc}</p>
-            </div>
+    <div className={`min-h-screen py-16 px-4 ${isDarkMode ? 'bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900' : 'bg-slate-50'}`}>
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-5xl md:text-6xl font-bold gradient-text mb-4">
+            FAQ
+          </h1>
+          <p className={`text-lg ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+            Everything you need to know about our waste classification system
+          </p>
+        </motion.div>
+
+        {/* FAQ Section */}
+        <motion.div
+          variants={containerVars}
+          initial="hidden"
+          animate="visible"
+          className="space-y-4 mb-16"
+        >
+          {faqs.map((faq, index) => (
+            <motion.div key={index} variants={itemVars}>
+              <motion.button
+                onClick={() => setActiveIndex(activeIndex === index ? null : index)}
+                className={`w-full text-left p-6 rounded-xl card-glow transition-all ${
+                  activeIndex === index
+                    ? isDarkMode
+                      ? 'bg-purple-600/20 border-purple-500/50'
+                      : 'bg-purple-100 border-purple-300'
+                    : isDarkMode
+                    ? 'bg-slate-800/30'
+                    : 'bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-lg">{faq.question}</h3>
+                  <motion.div
+                    animate={{ rotate: activeIndex === index ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDown
+                      size={24}
+                      className={activeIndex === index ? 'text-purple-400' : 'text-slate-400'}
+                    />
+                  </motion.div>
+                </div>
+              </motion.button>
+
+              <AnimatePresence>
+                {activeIndex === index && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className={`p-6 rounded-b-xl ${
+                      isDarkMode
+                        ? 'bg-slate-800/20'
+                        : 'bg-slate-50'
+                    }`}>
+                      <p className={`leading-relaxed ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
+
+        {/* Team Section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="mt-16 pt-16 border-t transition-colors"
+          style={{ borderTopColor: isDarkMode ? 'rgba(139, 92, 246, 0.2)' : 'rgba(0, 0, 0, 0.1)' }}
+        >
+          <h2 className="text-4xl font-bold gradient-text text-center mb-12">
+            Our Team
+          </h2>
+
+          <motion.div
+            variants={containerVars}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-2 gap-8"
+          >
+            {teamMembers.map((member, index) => (
+              <motion.div
+                key={index}
+                variants={itemVars}
+                whileHover={{ y: -5 }}
+                className={`card-glow p-6 rounded-xl text-center ${isDarkMode ? 'bg-slate-800/30' : 'bg-white'}`}
+              >
+                {/* Avatar placeholder */}
+                <motion.div
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
+                    isDarkMode ? 'bg-purple-600/20' : 'bg-purple-100'
+                  }`}
+                >
+                  <member.icon size={32} className="text-purple-400" />
+                </motion.div>
+
+                <h3 className="text-xl font-bold mb-2">{member.name}</h3>
+                <p className="text-purple-400 font-semibold mb-2">{member.role}</p>
+                <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                  {member.desc}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
