@@ -34,6 +34,10 @@ print("Model & Labels Loaded successfully!")
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok', 'service': 'waste-classification-api'})
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
@@ -48,27 +52,29 @@ def predict():
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
 
-        # --- PREPROCESSING (Same as Colab) ---
-        img = image.load_img(filepath, target_size=(224, 224))
-        img_array = image.img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array /= 255.0  # Normalize
+        try:
+            # --- PREPROCESSING (Same as Colab) ---
+            img = image.load_img(filepath, target_size=(224, 224))
+            img_array = image.img_to_array(img)
+            img_array = np.expand_dims(img_array, axis=0)
+            img_array /= 255.0  # Normalize
 
-        # --- PREDICTION ---
-        predictions = model.predict(img_array)
-        predicted_index = int(np.argmax(predictions))
-        confidence = float(np.max(predictions) * 100)
-        result_label = class_map.get(predicted_index, "Unknown")
+            # --- PREDICTION ---
+            predictions = model.predict(img_array)
+            predicted_index = int(np.argmax(predictions))
+            confidence = float(np.max(predictions) * 100)
+            result_label = class_map.get(predicted_index, "Unknown")
 
-        # Cleanup
-        os.remove(filepath)
-
-        return jsonify({
-            'class': result_label,
-            'confidence': confidence
-        })
+            return jsonify({
+                'class': result_label,
+                'confidence': confidence
+            })
+        finally:
+            if os.path.exists(filepath):
+                os.remove(filepath)
 
     return jsonify({'error': 'Invalid file type'}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', '5000'))
+    app.run(debug=True, host='0.0.0.0', port=port)

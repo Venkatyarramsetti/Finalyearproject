@@ -17,5 +17,5 @@ COPY . .
 # Create the uploads folder and fix permissions (Important for HF)
 RUN mkdir -p /code/uploads && chmod 777 /code/uploads
 
-# Hugging Face expects the app to run on port 7860
-CMD ["gunicorn", "-b", "0.0.0.0:7860", "app:app"]
+# Use PORT if provided (HF/local), fallback to 7860
+CMD ["sh", "-c", "gunicorn -b 0.0.0.0:${PORT:-7860} app:app"]
