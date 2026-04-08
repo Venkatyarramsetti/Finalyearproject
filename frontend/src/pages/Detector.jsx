@@ -31,9 +31,20 @@ const Detector = ({ isDarkMode }) => {
     }
   };
 
-  const handleFileChange = (file) => {
-    setFile(file);
-    setPreview(URL.createObjectURL(file));
+  const handleFileChange = (input) => {
+    const selectedFile = input?.target?.files?.[0] || input;
+
+    if (!selectedFile) {
+      return;
+    }
+
+    if (!selectedFile.type?.startsWith('image/')) {
+      setError('Please select a valid image file (PNG, JPG, JPEG).');
+      return;
+    }
+
+    setFile(selectedFile);
+    setPreview(URL.createObjectURL(selectedFile));
     setResult(null);
     setError('');
   };
@@ -150,11 +161,59 @@ const Detector = ({ isDarkMode }) => {
         : 'bg-red-50 border-red-200'
       : activeClassMeta.tone === 'safe'
       ? isDarkMode
-        ? 'bg-green-500/10 border-green-500/30'
+        ? 'bg-cyan-500/12 border-cyan-400/35'
         : 'bg-green-50 border-green-200'
       : isDarkMode
       ? 'bg-slate-700/30 border-slate-500/30'
       : 'bg-slate-100 border-slate-300';
+
+  const resultAccentTextClass =
+    activeClassMeta.tone === 'danger'
+      ? isDarkMode
+        ? 'text-red-300'
+        : 'text-red-700'
+      : activeClassMeta.tone === 'safe'
+      ? isDarkMode
+        ? 'text-cyan-200'
+        : 'text-emerald-700'
+      : isDarkMode
+      ? 'text-slate-200'
+      : 'text-slate-700';
+
+  const confidenceValueClass =
+    activeClassMeta.tone === 'danger'
+      ? 'text-red-400'
+      : activeClassMeta.tone === 'safe'
+      ? isDarkMode
+        ? 'text-cyan-300'
+        : 'text-emerald-600'
+      : 'text-purple-400';
+
+  const suggestionsPanelClass =
+    activeClassMeta.tone === 'danger'
+      ? isDarkMode
+        ? 'bg-red-500/10 border border-red-400/30'
+        : 'bg-red-50 border border-red-200'
+      : activeClassMeta.tone === 'safe'
+      ? isDarkMode
+        ? 'bg-cyan-500/10 border border-cyan-400/30'
+        : 'bg-emerald-50 border border-emerald-200'
+      : isDarkMode
+      ? 'bg-black/20 border border-slate-500/30'
+      : 'bg-white/70 border border-slate-200';
+
+  const suggestionsHeadingClass =
+    activeClassMeta.tone === 'danger'
+      ? isDarkMode
+        ? 'text-red-300'
+        : 'text-red-700'
+      : activeClassMeta.tone === 'safe'
+      ? isDarkMode
+        ? 'text-emerald-300'
+        : 'text-emerald-700'
+      : isDarkMode
+      ? 'text-amber-300'
+      : 'text-amber-700';
 
   return (
     <div className={`min-h-screen py-12 px-4 ${isDarkMode ? 'bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900' : 'bg-slate-50'}`}>
@@ -195,7 +254,10 @@ const Detector = ({ isDarkMode }) => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => e.target.files && handleFileChange(e.target.files[0])}
+                onChange={handleFileChange}
+                onClick={(e) => {
+                  e.target.value = '';
+                }}
                 className="hidden"
                 id="file-input-detector"
               />
@@ -248,6 +310,9 @@ const Detector = ({ isDarkMode }) => {
                 exit={{ opacity: 0, y: -10 }}
                 className="flex gap-4 justify-center flex-wrap"
               >
+                <div className={`w-full text-center text-sm ${isDarkMode ? 'text-cyan-200' : 'text-emerald-700'}`}>
+                  Selected: {file.name}
+                </div>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -327,12 +392,12 @@ const Detector = ({ isDarkMode }) => {
                     {activeClassMeta.tone === 'danger' ? (
                       <AlertCircle size={80} className="text-red-500" />
                     ) : (
-                      <CheckCircle size={80} className="text-green-500" />
+                      <CheckCircle size={80} className={isDarkMode ? 'text-cyan-300' : 'text-green-500'} />
                     )}
                   </motion.div>
 
                   {/* Classification Result */}
-                  <h2 className="text-3xl font-bold mb-2">
+                  <h2 className={`text-3xl font-bold mb-2 ${resultAccentTextClass}`}>
                     {activeClassMeta.title}
                   </h2>
 
@@ -340,7 +405,7 @@ const Detector = ({ isDarkMode }) => {
                   <div className="mt-8 space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold">Confidence Score</span>
-                      <span className="font-bold text-xl text-purple-400">
+                      <span className={`font-bold text-xl ${confidenceValueClass}`}>
                         {result.confidence ? result.confidence.toFixed(1) : 'N/A'}%
                       </span>
                     </div>
@@ -365,8 +430,8 @@ const Detector = ({ isDarkMode }) => {
                     {activeClassMeta.description}
                   </p>
 
-                  <div className={`mt-6 p-4 rounded-lg text-left ${isDarkMode ? 'bg-black/20' : 'bg-white/70'}`}>
-                    <p className="font-semibold mb-2">Suggested Next Steps</p>
+                  <div className={`mt-6 p-4 rounded-lg text-left ${suggestionsPanelClass}`}>
+                    <p className={`font-semibold mb-2 ${suggestionsHeadingClass}`}>Suggested Next Steps</p>
                     <ul className={`list-disc list-inside space-y-1 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                       {activeClassMeta.suggestions.map((tip) => (
                         <li key={tip}>{tip}</li>
